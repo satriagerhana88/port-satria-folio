@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const pool = require('../db');
+const { format } = require('date-fns');
+const { id: localeId } = require('date-fns/locale');
 
 // GET semua portfolio + media
 exports.getAllPortfolio = async (req, res) => {
@@ -13,12 +15,20 @@ exports.getAllPortfolio = async (req, res) => {
       GROUP BY p.id
       ORDER BY p.created_at DESC
     `);
-    res.json(result.rows);
+
+    const formatted = result.rows.map(p => ({
+      ...p,
+      start_date: p.start_date ? format(new Date(p.start_date), 'd MMMM yyyy', { locale: localeId }) : null,
+      end_date: p.end_date ? format(new Date(p.end_date), 'd MMMM yyyy', { locale: localeId }) : null
+    }));
+
+    res.json(formatted);
   } catch (err) {
     console.error('GET Error:', err.message);
     res.status(500).json({ error: 'Gagal mengambil data portfolio' });
   }
 };
+
 
 // Ambil portfolio berdasarkan ID
 exports.getPortfolioById = async (req, res) => {
@@ -38,7 +48,14 @@ exports.getPortfolioById = async (req, res) => {
       return res.status(404).json({ error: 'Portfolio tidak ditemukan' });
     }
 
-    res.json(result.rows[0]);
+    const data = result.rows[0];
+    const formatted = {
+      ...data,
+      start_date: data.start_date ? format(new Date(data.start_date), 'd MMMM yyyy', { locale: localeId }) : null,
+      end_date: data.end_date ? format(new Date(data.end_date), 'd MMMM yyyy', { locale: localeId }) : null
+    };
+
+    res.json(formatted);
   } catch (err) {
     console.error('Error:', err.message);
     res.status(500).json({ error: 'Gagal mengambil data portfolio' });

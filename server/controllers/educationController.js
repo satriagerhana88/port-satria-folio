@@ -1,23 +1,40 @@
 const pool = require('../db');
+const { format } = require('date-fns');
+const { id: localeId } = require('date-fns/locale');
 
+
+// GET all
 // GET all
 exports.getAllEducation = async (req, res) => {
   try {
     const eduResult = await pool.query('SELECT * FROM education ORDER BY start_date DESC');
+
     const withCertificates = await Promise.all(
       eduResult.rows.map(async (edu) => {
         const certs = await pool.query(
           'SELECT id, file_url FROM education_certificates WHERE education_id = $1',
           [edu.id]
         );
-        return { ...edu, certificates: certs.rows };
+
+        const formatted = {
+          ...edu,
+          start_date: format(new Date(edu.start_date), 'd MMMM yyyy', { locale: localeId }),
+          end_date: edu.end_date
+            ? format(new Date(edu.end_date), 'd MMMM yyyy', { locale: localeId })
+            : null,
+          certificates: certs.rows,
+        };
+
+        return formatted;
       })
     );
+
     res.json(withCertificates);
   } catch (err) {
     res.status(500).json({ error: 'Gagal mengambil data education' });
   }
 };
+
 
 // GET by ID
 exports.getEducationById = async (req, res) => {
@@ -26,15 +43,24 @@ exports.getEducationById = async (req, res) => {
     const edu = await pool.query('SELECT * FROM education WHERE id = $1', [id]);
     if (edu.rows.length === 0) return res.status(404).json({ error: 'Data tidak ditemukan' });
 
+    const data = edu.rows[0];
+    const formatted = {
+      ...data,
+      start_date: format(new Date(data.start_date), 'd MMMM yyyy', { locale: localeId }),
+      end_date: data.end_date ? format(new Date(data.end_date), 'd MMMM yyyy', { locale: localeId }) : null
+    };
+
     const certs = await pool.query(
       'SELECT id, file_url FROM education_certificates WHERE education_id = $1',
       [id]
     );
-    res.json({ ...edu.rows[0], certificates: certs.rows });
+
+    res.json({ ...formatted, certificates: certs.rows });
   } catch (err) {
-    res.status(500).json({ error: 'Gagal mengambil data' });
+    res.status(500).json({ error: 'Gagal mengambil detail education' });
   }
 };
+
 
 // CREATE education
 exports.createEducation = async (req, res) => {

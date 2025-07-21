@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 5100;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Test koneksi DB
 app.get('/api/portfolio-satriagerhana', async (req, res) => {
@@ -31,10 +32,24 @@ app.use('/uploads', express.static('uploads'));
 const portfolioRoutes = require('./routes/portfolio');
 app.use('/api/portfolio', portfolioRoutes);
 
+// Routing untuk experience
+const experienceRoutes = require('./routes/experience');
+app.use('/api/experience', experienceRoutes);
+
+
 // Routing untuk education
 const educationRoutes = require('./routes/education');
 app.use('/api/education', educationRoutes);
 
+
+// Routing untuk course
+const courseRoutes = require('./routes/course');
+app.use('/api/course', courseRoutes);
+
+
+// Routing untuk skill
+const skillRoutes = require('./routes/skill');
+app.use('/api', skillRoutes);
 
 
 
