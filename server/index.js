@@ -52,6 +52,11 @@ const skillRoutes = require('./routes/skill');
 app.use('/api', skillRoutes);
 
 
+// Routing untuk auth
+app.use('/api/auth', require('./routes/auth'));
+
+
+
 
 
 
