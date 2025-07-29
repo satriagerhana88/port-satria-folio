@@ -2,6 +2,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+import LogoSatria from '../assets/logo-satria.svg';
+
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,14 +20,19 @@ const handleLogin = async (e) => {
     localStorage.setItem('token', res.data.token);
     navigate('/dashboard');
   } catch (err) {
-    console.error(err); // ✅ gunakan err agar tidak warning
+    console.error(err);
     setError('Login gagal. Coba cek username/password.');
   }
 };
 
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-[#2C2638] px-32 grid grid-cols-2">
+      <div className='border flex items-center'>
+        <img src={LogoSatria} alt="Logo Satria" className='w-[55%]'/>
+        <p>Hey, Hello</p>
+        <p>Build Your Future from your skills</p>
+      </div>
       <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-96">
         <h2 className="text-2xl font-semibold mb-4">Admin Login</h2>
         {error && <p className="text-red-500">{error}</p>}
@@ -46,6 +53,12 @@ const handleLogin = async (e) => {
         <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
           Login
         </button>
+        {/* Reset Password */}
+        <div className="text-center mt-4">
+          <a href="/reset-password" className="text-blue-500 hover:underline">
+            Reset Password
+          </a>
+        </div>
       </form>
     </div>
   );

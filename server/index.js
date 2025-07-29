@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const pool = require('./db'); // koneksi ke database
-
 const app = express();
 const PORT = process.env.PORT || 5100;
 

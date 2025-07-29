@@ -1,6 +1,7 @@
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // ==========================
 // LOGIN
@@ -76,4 +77,29 @@ exports.updateAdmin = async (req, res) => {
 exports.logoutAdmin = (req, res) => {
   // Logout cukup hapus token di frontend
   res.json({ message: 'Berhasil logout (hapus token di client)' });
+};
+
+
+// 
+
+exports.resetPasswordManual = async (req, res) => {
+  const { resetCode, newPassword } = req.body;
+
+  try {
+    if (resetCode !== process.env.RESET_CODE) {
+      return res.status(403).json({ message: 'Kode rahasia salah!' });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    const update = await pool.query('UPDATE admins SET password = $1 WHERE username = $2', [hashed, 'admin']);
+
+    if (update.rowCount === 0) {
+      return res.status(404).json({ message: 'Admin tidak ditemukan' });
+    }
+
+    res.json({ message: 'Password berhasil direset. Silakan login dengan password baru.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mereset password' });
+  }
 };

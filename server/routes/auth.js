@@ -12,4 +12,8 @@ router.put('/update', verifyToken, authController.updateAdmin);
 // Logout admin (dilindungi token, meskipun opsional di backend)
 router.post('/logout', verifyToken, authController.logoutAdmin);
 
+// Reset password manual
+router.put('/manual-reset', authController.resetPasswordManual);
+
+
 module.exports = router;
